@@ -1,0 +1,8 @@
+Django==3.0.8
+joblib
+scikit-learn==0.22.1
+numpy
+pandas
+google-python-cloud-debugger
+pyyaml
+nltk
