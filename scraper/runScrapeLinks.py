@@ -1,9 +1,11 @@
 import scrapeLinks
 import pandas as pd
 
-base_path = 'https://www.tabletennisdaily.com/forum/forumdisplay.php?102-Rubbers'
+#base_path = 'https://www.tabletennisdaily.com/forum/forumdisplay.php?102-Rubbers'
+#base_path='https://www.tabletennisdaily.com/forum/forumdisplay.php?164-Butterfly'
+base_path = 'https://www.tabletennisdaily.com/forum/forumdisplay.php?177-Tibhar'
 
-for i in range(1,46):
+for i in range(1,3):
     page_path = "{base_path}/page{num}".format(base_path=base_path,num=i)
     print(page_path)
 
@@ -19,6 +21,6 @@ for i in range(1,46):
 
 all_links.drop_duplicates(inplace=True)
 print(all_links.shape)
-output_path = '../output/tabletennisdaily_rubber_threads.csv'
+output_path = '../output/tabletennisdaily_rubber_tibhar_threads.csv'
 all_links.to_csv(output_path,index=False)
 print('export is completed')
