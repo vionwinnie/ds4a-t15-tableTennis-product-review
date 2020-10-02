@@ -11,7 +11,7 @@ def connect_mongo(database_name,collection_name):
     mongoDbUser=login_dict['user']
     db_name = database_name
     mongoDbPwd=login_dict['password'] #kvbHGmyEErXa984v'
-    mongo_url = "mongodb+srv://{user_name}:{pwd}@cluster0.gwrcx.gcp.mongodb.net/{dbname}?retryWrites=true&w=majority".format(user_name=mongoDbUser,pwd=mongoDbPwd,dbname=db_name)
+    mongo_url = "mongodb+srv://{user_name}:{pwd}@cluster0.gwrcx.gcp.mongodb.net/{dbname}?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE".format(user_name=mongoDbUser,pwd=mongoDbPwd,dbname=db_name)
     client = MongoClient(mongo_url)
     db=getattr(client,database_name)
     mongo_collections = getattr(db,collection_name)
