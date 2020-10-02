@@ -2,7 +2,9 @@ import connectMongo
 
 ## Example of how to fetch data from MongoDB
 
-conn = connectMongo.connect_mongo('forums','tableTennisDaily')
+## current forum options are 'tableTennisDaily' and 'ooakForum'
+forum_name = 'ooakForum'
+conn = connectMongo.connect_mongo('forums',forum_name)
 myquery = { "meta_idx": { "$gt": 870 } }
 mydoc = conn.find(myquery)
 
@@ -17,6 +19,7 @@ for i,this_doc in enumerate(mydoc):
         ## extract the replies field (which is an array)
         replies = this_doc['replies']
         for reply in replies:
+            print("===================================")
             ## each reply is in dictionary form
             print(reply['clean_text'])
 
