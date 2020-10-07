@@ -1,6 +1,9 @@
 from common import connectMongo
 import re
 import pandas as pd
+import nltk
+import ast
+import time
 
 ## Example of how to fetch data from MongoDB
 def get_sample_data(conn,largest_idx):
@@ -59,6 +62,14 @@ def get_vs_data(conn):
     return vs_df
 
 
+def tokenize_sent(s):
+    if pd.isna(s):
+        return None
+    else:
+        s_split = s.split('\n') # ensures that \n is taken as a splitter
+        s_split = [t for t in s_split if t]
+        tokenized = list(map(nltk.sent_tokenize, s_split)) # list of lists
+        return [t for sub in tokenized for t in sub] # flatten out
 
 
 
