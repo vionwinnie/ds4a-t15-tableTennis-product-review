@@ -1,0 +1,4 @@
+1. set up SQLite3 db for revspin data
+2. set up SQLite3 db for some dummy comment data
+3. display individual comments
+4. set up connection to query db for revspin and comment_data and post-processing
