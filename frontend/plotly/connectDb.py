@@ -29,17 +29,31 @@ def retrieve_two_rubbers_stats(entity1,entity2,transpose=True):
     df.columns = new_header #set the header row as the df header
     return df
 
+def retrieve_comparative_comments(entity1,entity2):
+
+    """ 
+    Retrieve comparative rubber statement from db
+    """
+
+    ## 
+    if entity1 < entity2:
+        rubber_a = entity1
+        rubber_b = entity2
+    else:
+        rubber_a = entity2
+        rubber_b = entity1
+
+    query = """select * from comments where entity1='{}' and entity2='{}' """.format(rubber_a,rubber_b)
+
+    df = retrieve_data(query)
+    return df 
+
+
 if __name__=="__main__":
-    #con = connect_to_db()
+    entity1 = 'Hurricane 3'
+    entity2 = 'Tenergy 05'
+    df = retrieve_comparative_comments(entity1,entity2)
 
-    entity1 ='DHS Hurricane 3 (H3)' 
-    entity2 = 'Butterfly Tenergy 05'
-
-    df = retrieve_two_rubbers_stats(entity1,entity2,transpose=True)
     if len(df) > 0:
         for row in df.iterrows():
             print(row[1])
-    #df2 = df.transpose()
-    #print(df2.head())
-    # Be sure to close the connection
-    #con.close()

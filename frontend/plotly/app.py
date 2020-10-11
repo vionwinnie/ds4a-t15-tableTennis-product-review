@@ -6,7 +6,7 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc 
 import pandas as pd
 import createBarChart as cbc
-import connectDb
+import connectDb as c
 import nameConversion
 
 ## Initialize app with CSS stylesheets
@@ -17,7 +17,7 @@ app = dash.Dash(__name__,
         title='Rubber Shopper!')
 
 ## Intialize Sqlite3 db connection
-con = connectDb.connect_to_db()
+con = c.connect_to_db()
 
 
 ## Define Dropdown Menu Components
@@ -63,7 +63,7 @@ app.layout = html.Div([
     ]),
     dbc.Row([dbc.Col(html.Div(id='dd-entity-container'))],style={"margin-top": "15px","text-align":"center"}),
     dbc.Row([dbc.Col(dcc.Graph(style={'height':300},id='comparison-graph'),
-        width=6)],
+        width={"size": 5, "order": "first", "offset": 1})],
         style={"margin-top":"15px"},),
     dbc.Row([
         dbc.Col(
@@ -121,10 +121,19 @@ def update_graph(value1,value2):
     if len(value1)==0 or len(value2)==0: 
         return {'data':[], 'layout':go.Layout()}
     else:
-        df = cbc.create_dummy_df()
-        fig = cbc.create_chart(df,value1,value2)
-        return fig
-    #return 'Entity 1: "{}"'.format(value)
+        if value1 < value2:
+            rubber_a = value1
+            rubber_b = value2
+        else:
+            rubber_a = value2
+            rubber_b = value1
+        df = c.retrieve_comparative_comments(rubber_a,rubber_b)
+        tally_df = cbc.transform_df_barchart(rubber_a,rubber_b,df)
+        if len(tally_df)==0:
+            return {'data':[],'layout':go.Layout()}
+        else:
+            fig = cbc.create_chart(tally_df,rubber_a,rubber_b)
+            return fig
 
 ## update textbox from dropdown menu
 @app.callback(
@@ -132,7 +141,7 @@ def update_graph(value1,value2):
     [Input('demo-dropdown1', 'value'),
     Input('demo-dropdown2', 'value')])
 def update_output(value1,value2):
-    if len(value1)==0 or len(value2)==0:
+    if not value1  or not value2:
         return "Please select two rubbers!"
     elif value1 == value2:
         return "You have selected the same rubber twice. Try again"
@@ -152,7 +161,7 @@ def update_output(value1,value2):
         rubber1 = revSpinDict.get(value1,None)
         rubber2 = revSpinDict.get(value2,None)
         print(rubber1,rubber2)
-        df = connectDb.retrieve_two_rubbers_stats(rubber1,rubber2,transpose=True)
+        df = c.retrieve_two_rubbers_stats(rubber1,rubber2,transpose=True)
         table = dbc.Table.from_dataframe(df, striped=True, 
                                      bordered=True, 
                                      hover=True,
