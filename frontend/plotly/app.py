@@ -6,13 +6,21 @@ from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc 
 import pandas as pd
 import createBarChart as cbc
+import connectDb
+import nameConversion
 
+## Initialize app with CSS stylesheets
 external_stylesheets = [dbc.themes.BOOTSTRAP,'https://codepen.io/chriddyp/pen/bWLwgP.css']
 
 app = dash.Dash(__name__, 
         external_stylesheets=external_stylesheets,
         title='Rubber Shopper!')
 
+## Intialize Sqlite3 db connection
+con = connectDb.connect_to_db()
+
+
+## Define Dropdown Menu Components
 dropdown_menu1=dcc.Dropdown(
         id='demo-dropdown1',
         options=[
@@ -36,36 +44,70 @@ dropdown_menu2=dcc.Dropdown(
         placeholder="Select Rubber B"
         )
 
-df = pd.DataFrame(
-    {
-        "First Name": ["Arthur", "Ford", "Zaphod", "Trillian"],
-        "Last Name": ["Dent", "Prefect", "Beeblebrox", "Astra"],
-    }
-)
+## define name lookup for revspin data
+revSpinDict = nameConversion.revSpinDict
+#print(revSpinDict)
 
-table = dbc.Table.from_dataframe(df, striped=True, 
-                                     bordered=True, 
-                                     hover=True,
-                                     dark=True,
-                                     responsive=True,
-                                     className='dataTable')
+
 
 app.layout = html.Div([
+    html.H1('Your Go-To Table Tennis Rubber Analyzer',
+        style={'text-align':'center','margin-top':'30px'}),
     ## Row with columns
     dbc.Row(
     [
-                dbc.Col(dropdown_menu1,width=3),
-                dbc.Col(dropdown_menu2,width=3),
+                dbc.Col(dropdown_menu1,
+                    width={"size": 3, "order": "first", "offset":3 }),
+                dbc.Col(dropdown_menu2,
+                    width={"size": 3, "order": "first",  })
     ]),
-    dbc.Row([dbc.Col(html.Div(id='dd-entity-container'))]),
-    dbc.Row([dbc.Col(dcc.Graph(style={'height':300},id='comparison-graph'))]),
-    dbc.Row([dbc.Col(html.Div(id='table-container'),width={"size": 3, "order": "last", "offset": 1},)]),
+    dbc.Row([dbc.Col(html.Div(id='dd-entity-container'))],style={"margin-top": "15px","text-align":"center"}),
+    dbc.Row([dbc.Col(dcc.Graph(style={'height':300},id='comparison-graph'),
+        width=6)],
+        style={"margin-top":"15px"},),
     dbc.Row([
-        dbc.Col(html.Img(id='wordcloud-entity1',className='wordcloud'),width=3),
-        dbc.Col(html.Img(id='wordcloud-entity2',className='wordcloud'),width=3)
-        ],justify="start")
+        dbc.Col(
+            html.Div([
+            html.Div([
+                    html.Div([
+                            html.H4(id = "status",
+                            className = "subtitle",
+                            children=["init"])]),
+
+                            dcc.Interval(id="update1",interval=1000)
+                            ]),
+            html.Div(id='table-container',
+                    className='dataTable'),]),
+            width={"size": 4, "order": "first", "offset": 1},),
+        dbc.Col(
+            html.Div([
+            html.Div([
+                    html.Div([
+                            html.H4(id = "status-wordcloud1",
+                            className = "subtitle",
+                            children=["init"])]),
+
+                            dcc.Interval(id="update2",interval=1000)
+                            ]),
+            html.Img(id='wordcloud-entity1',
+            className='wordcloud'),]),
+            width=3),
+        dbc.Col(
+            html.Div([
+            html.Div([
+                    html.Div([
+                            html.H4(id = "status-wordcloud2",
+                            className = "subtitle",
+                            children=["init"])]),
+                            dcc.Interval(id="update3",interval=1000)
+                            ]),
+            html.Img(id='wordcloud-entity2',
+            className='wordcloud')]),
+            width=3)],
+        style={"margin-top":"80px"},
+        justify='start'),
     ]
-    ,className="dash-bootstrap")
+   ,className="dash-bootstrap")
 
 ## update graph from dropdown menu
 @app.callback(
@@ -107,14 +149,23 @@ def update_output(value1,value2):
     elif value1 == value2:
         return None #"You have selected the same rubber twice. Try again"
     else:
+        rubber1 = revSpinDict.get(value1,None)
+        rubber2 = revSpinDict.get(value2,None)
+        print(rubber1,rubber2)
+        df = connectDb.retrieve_two_rubbers_stats(rubber1,rubber2,transpose=True)
+        table = dbc.Table.from_dataframe(df, striped=True, 
+                                     bordered=True, 
+                                     hover=True,
+                                     dark=True,
+                                     responsive=True)
         return table
 
 
-## update wordcloud from dropdown menu
+## update wordcloud1 from dropdown menu
 static_image_route = '/assets/'
 @app.callback(
-    dash.dependencies.Output('wordcloud-entity1', 'src'),
-    [dash.dependencies.Input('demo-dropdown1', 'value')])
+    Output('wordcloud-entity1', 'src'),
+    [Input('demo-dropdown1', 'value')])
 def update_image_src(value):
     if not value:
         return None
@@ -123,10 +174,10 @@ def update_image_src(value):
         path = static_image_route + new_val + '.png'
         return path
 
-
+## update wordcloud2 image
 @app.callback(
-    dash.dependencies.Output('wordcloud-entity2', 'src'),
-    [dash.dependencies.Input('demo-dropdown2', 'value')])
+    Output('wordcloud-entity2', 'src'),
+    [Input('demo-dropdown2', 'value')])
 def update_image_src(value):
     if not value:
         return None
@@ -134,7 +185,32 @@ def update_image_src(value):
         new_val = value.replace(' ','-')
         path = static_image_route + new_val + '.png'
         return path
+
+## Display Table Name
+@app.callback(Output("status", "children"),
+              [Input('demo-dropdown1', 'value'),
+               Input('demo-dropdown2', 'value')])
+def update_statusBar(value1,value2):
+    if value1 and value2:
+        return "RevSpin Data"
+
+## Display Wordcloud1 Title
+@app.callback(Output("status-wordcloud1", "children"),
+              [Input('demo-dropdown1', 'value'),
+            ])
+def update_statusBar(value1):
+    if value1:
+        return value1+" Wordcloud"
+
+## Display Wordcloud2 Title
+@app.callback(Output("status-wordcloud2", "children"),
+              [Input('demo-dropdown2', 'value'),
+            ])
+def update_statusBar(value1):
+    if value1:
+        return value1+" Wordcloud"
+
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=True,port=8888)

@@ -95,12 +95,19 @@
 }
 
 .wordcloud{
-  max-width: 300px;
-  height: 200px;
+  max-width: 380px;
+  height: 380px;
   background-color: powderblue;
+  text-align: center;
+  justify-content: center;
 }
 
-.dataTable{
-    margin-top:5px;
+.subtitle{
+    text-align:center;
+    background-color: powderblue;
+    border-radius: 8px;
 }
+/*.dataTable{
+    margin-top:80px;
+} */
 

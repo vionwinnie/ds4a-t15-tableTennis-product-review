@@ -1,4 +1,5 @@
-1. set up SQLite3 db for revspin data
 2. set up SQLite3 db for some dummy comment data
 3. display individual comments
-4. set up connection to query db for revspin and comment_data and post-processing
+4. set up connection to query db for comment_data and post-processing
+5. add h4 header for stacked bar chart
+6. Decorate h1
