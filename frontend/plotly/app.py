@@ -44,6 +44,41 @@ dropdown_menu2=dcc.Dropdown(
         placeholder="Select Rubber B"
         )
 
+nested_column = [
+        dbc.Row([
+            dbc.Col(html.Div([html.Button('Button 1', id='btn-nclicks-1', n_clicks=0)]))
+            ]),
+
+        dbc.Row([
+            dbc.Col(html.Div([html.P(
+                className = "comments-text",
+                id="comment-display-1",
+                children=["Comments-1"]),
+            dcc.Interval(id="update-nested1",interval=1000)],
+            id = "comment-block-1",
+            className = "comment-block"
+            )),
+        ]),
+        dbc.Row([
+            dbc.Col(html.Div([html.P(className = "comments-text",
+                id="comment-display-2",
+                children=["Comments-2"]),
+                dcc.Interval(id="update-nested2",interval=1000)],
+            id = "comment-block-1",
+            className = "comment-block"
+            )),
+        ]),
+        dbc.Row([
+            dbc.Col(html.Div([html.P(className = "comments-text",
+                id="comment-display-3",
+                children=["Comments-3"]),
+            dcc.Interval(id="update-nested3",interval=1000)],
+            id = "comment-block-1",
+            className = "comment-block"
+            )),
+        ])
+    ]
+
 ## define name lookup for revspin data
 revSpinDict = nameConversion.revSpinDict
 #print(revSpinDict)
@@ -62,9 +97,37 @@ app.layout = html.Div([
                     width={"size": 3, "order": "first",  })
     ]),
     dbc.Row([dbc.Col(html.Div(id='dd-entity-container'))],style={"margin-top": "15px","text-align":"center"}),
-    dbc.Row([dbc.Col(dcc.Graph(style={'height':300},id='comparison-graph'),
-        width={"size": 5, "order": "first", "offset": 1})],
+    dbc.Row([
+        dbc.Col(
+            html.Div([
+            html.Div([
+                    html.Div([
+                            html.H4(id = "status-bar",
+                            className = "subtitle",
+                            children=["Online Forum Opinion Mining Results"])]),
+
+                            dcc.Interval(id="update4",interval=1000)
+                            ]),
+            dcc.Graph(style={'height':300},id='comparison-graph'),]),
+        width={"size": 5, "order": "first", "offset": 1}),
+        dbc.Col(
+            html.Div([
+            html.Div([
+                    html.Div([
+                            html.H4(id = "status-selected-comments",
+                            className = "subtitle",
+                            children=["Selected Comments"])]),
+
+                            dcc.Interval(id="update6",interval=1000)
+                            ]),
+            html.Div(nested_column,id='comment-container',
+                    className='dataTable'),]),
+        width={"size": 5, "order": "last"})],
         style={"margin-top":"15px"},),
+
+    #dbc.Row([dbc.Col(dcc.Graph(style={'height':300},id='comparison-graph'),
+    #    width={"size": 5, "order": "first", "offset": 1})],
+    #    style={"margin-top":"15px"},),
     dbc.Row([
         dbc.Col(
             html.Div([
@@ -78,7 +141,7 @@ app.layout = html.Div([
                             ]),
             html.Div(id='table-container',
                     className='dataTable'),]),
-            width={"size": 4, "order": "first", "offset": 1},),
+            width={"size": 4, "order": "first","offset":1},),
         dbc.Col(
             html.Div([
             html.Div([
@@ -103,38 +166,70 @@ app.layout = html.Div([
                             ]),
             html.Img(id='wordcloud-entity2',
             className='wordcloud')]),
-            width=3)],
+            width=3),
+        html.Div(id='intermediate-value', style={'display': 'none'})
+        ],
         style={"margin-top":"80px"},
         justify='start'),
     ]
    ,className="dash-bootstrap")
 
-## update graph from dropdown menu
-@app.callback(
-    Output('comparison-graph', 'figure'),
-    [Input('demo-dropdown1', 'value'),
-    Input('demo-dropdown2', 'value')
-    ])
-def update_graph(value1,value2):
-    print(value1,value2)
-
+## store data in hidden div
+@app.callback(Output('intermediate-value', 'children'),[Input('demo-dropdown1', 'value'),Input('demo-dropdown2', 'value')])
+def store_df(value1,value2):
     if len(value1)==0 or len(value2)==0: 
-        return {'data':[], 'layout':go.Layout()}
+        return None
+    elif value1 == value2:
+        return None
     else:
-        if value1 < value2:
-            rubber_a = value1
-            rubber_b = value2
-        else:
-            rubber_a = value2
-            rubber_b = value1
+        rubber_a,rubber_b = (value1,value2) if value1<value2 else (value2,value1)
         df = c.retrieve_comparative_comments(rubber_a,rubber_b)
-        tally_df = cbc.transform_df_barchart(rubber_a,rubber_b,df)
-        if len(tally_df)==0:
-            return {'data':[],'layout':go.Layout()}
-        else:
-            fig = cbc.create_chart(tally_df,rubber_a,rubber_b)
-            return fig
+        return df.to_json()
 
+## Update stacked bar chart based on intermediate output
+@app.callback(Output('comparison-graph', 'figure'), 
+        [Input('intermediate-value', 'children'),
+            Input('demo-dropdown1', 'value'),
+            Input('demo-dropdown2', 'value')])
+def update_graph2(json_cleaned_data,value1,value2):
+    graph_output = {'data':[], 'layout':go.Layout()}
+    if json_cleaned_data:
+        df = pd.read_json(json_cleaned_data)
+        rubber_a,rubber_b = (value1,value2) if value1 < value2 else (value2,value1)
+        tally_df = cbc.transform_df_barchart(rubber_a,rubber_b,df)
+        graph_output = cbc.create_chart(tally_df,rubber_a,rubber_b)
+    return graph_output
+
+## update graph from dropdown menu
+#@app.callback(
+#    [Output('comparison-graph', 'figure'),Output('dd-entity-container', 'children')],
+#    [Input('demo-dropdown1', 'value'),Input('demo-dropdown2', 'value')])
+#def update_graph(value1,value2):
+#    print(value1,value2)
+#    graph_output = {'data':[], 'layout':go.Layout()} 
+#
+#    if len(value1)==0 or len(value2)==0: 
+#        text_output = "Please select two rubbers!"
+#        return graph_output, text_output
+#    elif value1 == value2:
+#        text_output = "You have selected the same rubber twice. Try again!"
+#        return graph_output, text_output
+#    else:
+#        if value1 < value2:
+#            rubber_a = value1
+#            rubber_b = value2
+#        else:
+#            rubber_a = value2
+#            rubber_b = value1
+#        df = c.retrieve_comparative_comments(rubber_a,rubber_b)
+#        tally_df = cbc.transform_df_barchart(rubber_a,rubber_b,df)
+#        text_output = "You are comparing {} against {}!".format(rubber_a,rubber_b)
+#        if len(tally_df)==0:
+#            return graph_output, text_output
+#        else:
+#            graph_output = cbc.create_chart(tally_df,rubber_a,rubber_b)
+#            return graph_output, text_output 
+#
 ## update textbox from dropdown menu
 @app.callback(
     Output('dd-entity-container', 'children'),
@@ -154,9 +249,9 @@ def update_output(value1,value2):
     Input('demo-dropdown2', 'value')])
 def update_output(value1,value2):
     if len(value1)==0 or len(value2)==0:
-        return None#"Please select two rubbers!"
+        return None
     elif value1 == value2:
-        return None #"You have selected the same rubber twice. Try again"
+        return None
     else:
         rubber1 = revSpinDict.get(value1,None)
         rubber2 = revSpinDict.get(value2,None)

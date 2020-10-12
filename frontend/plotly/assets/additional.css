@@ -116,3 +116,9 @@
     text-align: center;
 }
 
+.comment-block {
+/*  height: 200px;*/
+  width: 100%;
+  background-color: DarkSlateBlue;
+  border-radius: 8px;
+}

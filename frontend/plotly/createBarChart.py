@@ -66,6 +66,7 @@ def create_chart(data,entity1,entity2):
         width=700,
         height=400,
         plot_bgcolor='rgba(0,0,0,0)',
+        margin = {'t':20},
 #        title={
 #            'text': title_text,
 #            'y':0.96,
