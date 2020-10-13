@@ -7,7 +7,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 import createBarChart as cbc
 import connectDb as c
-import nameConversion
+import nameConversion as nm
 
 ## Initialize app with CSS stylesheets
 external_stylesheets = [dbc.themes.BOOTSTRAP,'https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -19,26 +19,19 @@ app = dash.Dash(__name__,
 ## Intialize Sqlite3 db connection
 con = c.connect_to_db()
 
-
+## Initialize name conversion
+revspin_dict, dropdown_menu = nm.rubbers_conversion()
 ## Define Dropdown Menu Components
 dropdown_menu1=dcc.Dropdown(
         id='demo-dropdown1',
-        options=[
-            {'label': 'Butterfly Tenergy 05', 'value': 'Tenergy 05'},
-            {'label': 'Hurricane 3', 'value': 'Hurricane 3'},
-            {'label': 'Evolution MX-P', 'value': 'MXP'}
-        ],
+        options= dropdown_menu,
         value='',
         style={'float': 'center','margin': 'auto'},
         placeholder="Select Rubber A"
         )
 dropdown_menu2=dcc.Dropdown(
         id='demo-dropdown2',
-        options=[
-            {'label': 'Butterfly Tenergy 05', 'value': 'Tenergy 05'},
-            {'label': 'Hurricane 3', 'value': 'Hurricane 3'},
-            {'label': 'Evolution MX-P', 'value': 'MXP'}
-        ],
+        options= dropdown_menu,
         value='',
         style={'float': 'center','margin': 'auto'},
         placeholder="Select Rubber B"
@@ -48,9 +41,16 @@ nested_column = [
         dbc.Row([
             dbc.Col(
                 html.Div([
-                    html.Button('Button 1', id='btn-nclicks-1', n_clicks=0)
+                    html.Button('Next', 
+                        id='btn-nclicks-1', 
+                        n_clicks=0,
+                        className="pageScrollBtn"),
+                    html.Button('Previous', 
+                        id='btn-nclicks-2', 
+                        n_clicks=0,
+                        className="pageScrollBtn")
                 ]))
-            ]),
+            ],className="btn-div"),
         dbc.Row([
             dbc.Col(
                 html.Div([
@@ -97,18 +97,27 @@ nested_column = [
                 children=["Comments-3"]),
             dcc.Interval(id="update-nested3",interval=1000)],
             id = "comment-block-3",
-            #className = "comment-block"
             )),
         ],
                 className = "comment-block"
-        )
+        ),
+        dbc.Row([
+            dbc.Col(html.Div([
+            html.Img(className = "avatar",
+                id="avatar-4",
+                src="/assets/icons/png/033-penguin.png")])
+            ,width=2),
+            dbc.Col(html.Div([
+            html.P(className = "comments-text",
+                id="comment-display-4",
+                children=["Comments-4"]),
+            dcc.Interval(id="update-nested8",interval=1000)],
+            id = "comment-block-4",
+            )),
+        ],
+                className = "comment-block"
+        ),
     ]
-
-## define name lookup for revspin data
-revSpinDict = nameConversion.revSpinDict
-#print(revSpinDict)
-
-
 
 app.layout = html.Div([
     html.H1('Your Go-To Table Tennis Rubber Analyzer',
@@ -142,7 +151,6 @@ app.layout = html.Div([
                             html.H4(id = "status-selected-comments",
                             className = "subtitle",
                             children=["Selected Comments"])]),
-
                             dcc.Interval(id="update6",interval=1000)
                             ]),
             html.Div(nested_column,id='comment-container',
@@ -208,7 +216,12 @@ def store_df(value1,value2):
     else:
         rubber_a,rubber_b = (value1,value2) if value1<value2 else (value2,value1)
         df = c.retrieve_comparative_comments(rubber_a,rubber_b)
-        return df.to_json()
+        print(rubber_a,rubber_b)
+        print(df.shape)
+        if df.shape[0]==0:
+            return None
+        else:
+            return df.to_json()
 
 ## Update stacked bar chart based on intermediate output
 @app.callback(Output('comparison-graph', 'figure'), 
@@ -247,9 +260,8 @@ def update_output(value1,value2):
     elif value1 == value2:
         return None
     else:
-        rubber1 = revSpinDict.get(value1,None)
-        rubber2 = revSpinDict.get(value2,None)
-        print(rubber1,rubber2)
+        rubber1 = revspin_dict.get(value1,None)
+        rubber2 = revspin_dict.get(value2,None)
         df = c.retrieve_two_rubbers_stats(rubber1,rubber2,transpose=True)
         table = dbc.Table.from_dataframe(df, striped=True, 
                                      bordered=True, 
@@ -259,30 +271,51 @@ def update_output(value1,value2):
         return table
 
 
-## update wordcloud1 from dropdown menu
-static_image_route = '/assets/'
+## update wordcloud1 and title from dropdown menu
+static_image_route = '/assets/wordcloud/'
 @app.callback(
-    Output('wordcloud-entity1', 'src'),
+    [Output('wordcloud-entity1', 'src'),
+        Output('status-wordcloud1','children')],
     [Input('demo-dropdown1', 'value')])
-def update_image_src(value):
+def update_image_src_and_title(value):
     if not value:
-        return None
+        return None,None
     else:
-        new_val = value.replace(' ','-')
-        path = static_image_route + new_val + '.png'
-        return path
+        path = static_image_route + value + '.png'
+        title = value.replace('-',' ')+ " Wordcloud"
+        return path,title
 
-## update wordcloud2 image
+## Update wordcloud2 and title2
 @app.callback(
-    Output('wordcloud-entity2', 'src'),
+    [Output('wordcloud-entity2', 'src'),
+        Output('status-wordcloud2','children')],
     [Input('demo-dropdown2', 'value')])
-def update_image_src(value):
+def update_image_src_and_title(value):
     if not value:
-        return None
+        return None,None
     else:
-        new_val = value.replace(' ','-')
-        path = static_image_route + new_val + '.png'
-        return path
+        path = static_image_route + value + '.png'
+        title = value.replace('-',' ')+ " Wordcloud"
+        return path,title
+
+## Display Comments
+@app.callback([Output("comment-display-1","children"),
+                Output("comment-display-2","children"),
+                Output("comment-display-3","children"),
+                Output("comment-display-4","children")],
+            [Input('intermediate-value', 'children')])
+def update_comments(json_cleaned_data):
+    if json_cleaned_data:
+        df = pd.read_json(json_cleaned_data)
+        comments_array = list(set(df['COMMENT_TEXT']))
+        comment_1 = comments_array.pop() if comments_array else ''
+        comment_2 = comments_array.pop() if comments_array else ''
+        comment_3 = comments_array.pop() if comments_array else ''
+        comment_4 = comments_array.pop() if comments_array else ''
+        
+        return comment_1,comment_2,comment_3,comment_4
+    else:
+        return None,None,None,None
 
 ## Display Table Name
 @app.callback(Output("status", "children"),
@@ -291,22 +324,6 @@ def update_image_src(value):
 def update_statusBar(value1,value2):
     if value1 and value2:
         return "RevSpin Data"
-
-## Display Wordcloud1 Title
-@app.callback(Output("status-wordcloud1", "children"),
-              [Input('demo-dropdown1', 'value'),
-            ])
-def update_statusBar(value1):
-    if value1:
-        return value1+" Wordcloud"
-
-## Display Wordcloud2 Title
-@app.callback(Output("status-wordcloud2", "children"),
-              [Input('demo-dropdown2', 'value'),
-            ])
-def update_statusBar(value1):
-    if value1:
-        return value1+" Wordcloud"
 
 
 

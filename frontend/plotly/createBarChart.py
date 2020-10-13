@@ -93,6 +93,10 @@ def transform_df_barchart(entity1,entity2,df):
     tallying['SUBGROUP_PCT'] = tallying.COMMENT_ID / tallying.groupby('ASPECT')['COMMENT_ID'].transform('sum') *100
     ## Summarize percentage
     tallying_pivot_df = tallying.pivot(index='ASPECT', columns='DIRECTION', values='SUBGROUP_PCT')
+    col_names = ['l','g','e']
+    for col_name in col_names:
+        if col_name not in list(tallying_pivot_df.columns):
+            tallying_pivot_df.loc[:,col_name]=0
     tallying_pivot_df.fillna(0,inplace=True)
 
     ## Rename using mapping

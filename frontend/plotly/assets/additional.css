@@ -118,10 +118,11 @@
 
 .comment-block {
 /*  height: 200px;*/
-  width: 100%;
+  width: 95%;
   background-color: CornflowerBlue;
   border-radius: 8px;
   margin-top: 5px;
+  margin-left:5px;
 }
 
 .avatar {
@@ -129,6 +130,13 @@
   height: 60px;
 }
 
-#btn-nclicks-1 {
-   float: left;
+.pageScrollBtn{
+    float:right;
+}
+
+.btn-div{
+  width:95%;
+  border-radius: 8px;
+  margin-top: 5px;
+  margin-left:5px;
 }

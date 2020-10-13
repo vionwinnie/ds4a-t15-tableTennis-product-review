@@ -416,10 +416,10 @@ DHS Gold Arc,10,10,6,9.5,40,2,Double Happiness (DHS)
 DHS Gold Arc 3,8.8,9.2,5.1,9.4,39,15,Double Happiness (DHS)
 DHS Gold Arc 5,8.9,9.2,2.7,9.4,25,24,Double Happiness (DHS)
 DHS Gold Arc 8,9.4,9.4,2.1,9.4,46,108,Double Happiness (DHS)
-DHS Hurricane 2 (H2),8.5,9.3,8.6,8.8,14,75,Double Happiness (DHS)
+DHS Hurricane 2,8.5,9.3,8.6,8.8,14,75,Double Happiness (DHS)
 DHS Hurricane 2 (No. 19 Sponge),8.7,9,6.9,8.8,18,10,Double Happiness (DHS)
 DHS Hurricane 2 National (Signature),9.4,9.5,6.7,9.3,42,7,Double Happiness (DHS)
-DHS Hurricane 3 (H3),8.1,8.9,8.2,8.6,22,119,Double Happiness (DHS)
+DHS Hurricane 3,8.1,8.9,8.2,8.6,22,119,Double Happiness (DHS)
 DHS Hurricane 3 (H3) Pro (Tuned),8.7,9.3,7.6,8.9,55,10,Double Happiness (DHS)
 DHS Hurricane 3 (National),8.1,9.4,7.9,8.7,35,18,Double Happiness (DHS)
 DHS Hurricane 3 (No. 19 Sponge),7.7,9.2,8.1,8.6,18,21,Double Happiness (DHS)
@@ -1305,13 +1305,13 @@ Tibhar Aurus TC-1,8.8,9.5,2,9.4,28,7,Tibhar
 Tibhar Bungee,8.8,8.1,6.5,8.8,44,2,Tibhar
 Tibhar Dang,6.4,7.5,7.7,6.6,31,7,Tibhar
 Tibhar Ellen,4,3.3,2,7.5,30,2,Tibhar
-Tibhar Evolution EL-P,9.2,9.3,2.2,9.4,58,61,Tibhar
-Tibhar Evolution EL-S,8.7,9,2.3,8.9,46,45,Tibhar
-Tibhar Evolution FX-P,8.8,9.3,2,9.3,58,45,Tibhar
-Tibhar Evolution FX-S,8.6,9.3,1.3,9.2,58,18,Tibhar
-Tibhar Evolution MX-P,9.5,9.3,2.3,9.4,45,111,Tibhar
-Tibhar Evolution MX-P 50,9.3,9.4,1.7,9.5,49,21,Tibhar
-Tibhar Evolution MX-S,9.2,9.5,2.4,9.5,50,84,Tibhar
+Tibhar Evolution EL P,9.2,9.3,2.2,9.4,58,61,Tibhar
+Tibhar Evolution EL S,8.7,9,2.3,8.9,46,45,Tibhar
+Tibhar Evolution FX P,8.8,9.3,2,9.3,58,45,Tibhar
+Tibhar Evolution FX S,8.6,9.3,1.3,9.2,58,18,Tibhar
+Tibhar Evolution MX P,9.5,9.3,2.3,9.4,45,111,Tibhar
+Tibhar Evolution MX P 50,9.3,9.4,1.7,9.5,49,21,Tibhar
+Tibhar Evolution MX S,9.2,9.5,2.4,9.5,50,84,Tibhar
 Tibhar Genius,8.8,9.2,2.9,9.3,50,51,Tibhar
 Tibhar Genius Sound,8.7,9.5,2.7,9.4,46,58,Tibhar
 Tibhar Genius Supreme,8.8,9,2,9.2,50,1,Tibhar
