@@ -119,6 +119,16 @@
 .comment-block {
 /*  height: 200px;*/
   width: 100%;
-  background-color: DarkSlateBlue;
+  background-color: CornflowerBlue;
   border-radius: 8px;
+  margin-top: 5px;
+}
+
+.avatar {
+  max-width: 60px;
+  height: 60px;
+}
+
+#btn-nclicks-1 {
+   float: left;
 }

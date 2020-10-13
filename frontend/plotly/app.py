@@ -46,37 +46,62 @@ dropdown_menu2=dcc.Dropdown(
 
 nested_column = [
         dbc.Row([
-            dbc.Col(html.Div([html.Button('Button 1', id='btn-nclicks-1', n_clicks=0)]))
+            dbc.Col(
+                html.Div([
+                    html.Button('Button 1', id='btn-nclicks-1', n_clicks=0)
+                ]))
             ]),
-
         dbc.Row([
-            dbc.Col(html.Div([html.P(
-                className = "comments-text",
-                id="comment-display-1",
-                children=["Comments-1"]),
-            dcc.Interval(id="update-nested1",interval=1000)],
-            id = "comment-block-1",
-            className = "comment-block"
+            dbc.Col(
+                html.Div([
+                    html.Img(className = "avatar",
+                            id="avatar-1",
+                            src="/assets/icons/png/006-moon.png")]),width=2),
+            dbc.Col(
+                html.Div([
+                    html.P(className = "comments-text",
+                            id="comment-display-1",
+                            children=["Comments-1"]),
+                    dcc.Interval(id="update-nested1",interval=1000)],
+                            id = "comment-block-1",
             )),
-        ]),
+        ],
+        className = "comment-block"
+        ),
         dbc.Row([
-            dbc.Col(html.Div([html.P(className = "comments-text",
+            dbc.Col(html.Div([
+            html.Img(className = "avatar",
+                id="avatar-2",
+                src="/assets/icons/png/025-chicken.png")])
+            ,width=2),
+            dbc.Col(html.Div([
+            html.P(className = "comments-text",
                 id="comment-display-2",
                 children=["Comments-2"]),
-                dcc.Interval(id="update-nested2",interval=1000)],
-            id = "comment-block-1",
-            className = "comment-block"
+            dcc.Interval(id="update-nested2",interval=1000)],
+            id = "comment-block-2",
             )),
-        ]),
+             #   className = "comment-block"
+        ],
+            className = "comment-block"
+        ),
         dbc.Row([
-            dbc.Col(html.Div([html.P(className = "comments-text",
+            dbc.Col(html.Div([
+            html.Img(className = "avatar",
+                id="avatar-3",
+                src="/assets/icons/png/043-cactus.png")])
+            ,width=2),
+            dbc.Col(html.Div([
+            html.P(className = "comments-text",
                 id="comment-display-3",
                 children=["Comments-3"]),
             dcc.Interval(id="update-nested3",interval=1000)],
-            id = "comment-block-1",
-            className = "comment-block"
+            id = "comment-block-3",
+            #className = "comment-block"
             )),
-        ])
+        ],
+                className = "comment-block"
+        )
     ]
 
 ## define name lookup for revspin data
@@ -167,8 +192,7 @@ app.layout = html.Div([
             html.Img(id='wordcloud-entity2',
             className='wordcloud')]),
             width=3),
-        html.Div(id='intermediate-value', style={'display': 'none'})
-        ],
+        html.Div(id='intermediate-value', style={'display': 'none'})],
         style={"margin-top":"80px"},
         justify='start'),
     ]
@@ -200,36 +224,6 @@ def update_graph2(json_cleaned_data,value1,value2):
         graph_output = cbc.create_chart(tally_df,rubber_a,rubber_b)
     return graph_output
 
-## update graph from dropdown menu
-#@app.callback(
-#    [Output('comparison-graph', 'figure'),Output('dd-entity-container', 'children')],
-#    [Input('demo-dropdown1', 'value'),Input('demo-dropdown2', 'value')])
-#def update_graph(value1,value2):
-#    print(value1,value2)
-#    graph_output = {'data':[], 'layout':go.Layout()} 
-#
-#    if len(value1)==0 or len(value2)==0: 
-#        text_output = "Please select two rubbers!"
-#        return graph_output, text_output
-#    elif value1 == value2:
-#        text_output = "You have selected the same rubber twice. Try again!"
-#        return graph_output, text_output
-#    else:
-#        if value1 < value2:
-#            rubber_a = value1
-#            rubber_b = value2
-#        else:
-#            rubber_a = value2
-#            rubber_b = value1
-#        df = c.retrieve_comparative_comments(rubber_a,rubber_b)
-#        tally_df = cbc.transform_df_barchart(rubber_a,rubber_b,df)
-#        text_output = "You are comparing {} against {}!".format(rubber_a,rubber_b)
-#        if len(tally_df)==0:
-#            return graph_output, text_output
-#        else:
-#            graph_output = cbc.create_chart(tally_df,rubber_a,rubber_b)
-#            return graph_output, text_output 
-#
 ## update textbox from dropdown menu
 @app.callback(
     Output('dd-entity-container', 'children'),
