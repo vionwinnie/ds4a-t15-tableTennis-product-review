@@ -209,7 +209,7 @@ app.layout = html.Div([
 ## store data in hidden div
 @app.callback(Output('intermediate-value', 'children'),[Input('demo-dropdown1', 'value'),Input('demo-dropdown2', 'value')])
 def store_df(value1,value2):
-    if len(value1)==0 or len(value2)==0: 
+    if not value1 or not value2:
         return None
     elif value1 == value2:
         return None
