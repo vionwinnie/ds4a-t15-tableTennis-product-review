@@ -15,7 +15,7 @@ def create_chart(data,entity1,entity2):
 
     fig.add_trace(go.Bar(
         x=data[x_1],
-        y=data.ASPECT,
+        y=data.DISPLAY_ASPECT,
         name=x_1.replace('%',''),
         text=data[x_1].apply(lambda x: "{:.1f}{}".format(x, ' %')),
         textposition='inside',
@@ -28,7 +28,7 @@ def create_chart(data,entity1,entity2):
     ))
     fig.add_trace(go.Bar(
         x=data[x_2],
-        y=data.ASPECT,
+        y=data.DISPLAY_ASPECT,
         name=x_2.replace('%',''),
         text=data[x_2].apply(lambda x: "{:.1f}{}".format(x, ' %')),
         textposition='inside',
@@ -42,7 +42,7 @@ def create_chart(data,entity1,entity2):
     ))
     fig.add_trace(go.Bar(
         x=data[x_3],
-        y=data.ASPECT,
+        y=data.DISPLAY_ASPECT,
         name=x_3.replace('%',''),
         text=data[x_3].apply(lambda x: "{:.1f}{}".format(x, ' %')),
         textposition='inside',
@@ -86,7 +86,11 @@ def create_dummy_df():
     return df2
 
 def transform_df_barchart(entity1,entity2,df):
-   
+  
+    ## Total count for each aspect
+    total_df = df.groupby(['ASPECT'])['COMMENT_ID'].count().reset_index()
+    total_df.rename(columns={'COMMENT_ID':'TOTAL_COUNT'},inplace=True)
+
     ## Count each subgroup
     tallying = df.groupby(['ASPECT','DIRECTION'])['COMMENT_ID'].count().reset_index()
     ## Calculate percentage
@@ -104,7 +108,12 @@ def transform_df_barchart(entity1,entity2,df):
     tallying_pivot_df.rename(columns=col_conversion,inplace=True)
     tallying_pivot_df.reset_index(inplace=True)
 
-    return tallying_pivot_df
+    ## Combine tallying and total
+    final = tallying_pivot_df.merge(total_df,on='ASPECT')
+    final.sort_values('TOTAL_COUNT',ascending=True,inplace=True)
+    final.loc[:,'DISPLAY_ASPECT'] = final['ASPECT']+ ' [' + final['TOTAL_COUNT'].astype(str) + '] '
+
+    return final
 
 
 

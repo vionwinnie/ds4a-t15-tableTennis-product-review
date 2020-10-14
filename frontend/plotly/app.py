@@ -2,13 +2,15 @@ import dash
 import dash_html_components as html
 import dash_core_components as dcc
 import plotly.graph_objects as go
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output,State
 import dash_bootstrap_components as dbc 
+from dash.exceptions import PreventUpdate
 import pandas as pd
 import createBarChart as cbc
 import connectDb as c
 import nameConversion as nm
 import json
+import displayComments as dc 
 
 ## Initialize app with CSS stylesheets
 external_stylesheets = [dbc.themes.BOOTSTRAP,'https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -203,28 +205,33 @@ app.layout = html.Div([
             html.Img(id='wordcloud-entity2',
             className='wordcloud')]),
             width=3),
-        html.Div(id='intermediate-value', style={'display': 'none'})],
+        html.Div(id='intermediate-value', style={'display': 'none'}),
+        html.Div(id='intermediate-value2',style={'display': 'none'})],
         style={"margin-top":"80px"},
         justify='start'),
     ]
    ,className="dash-bootstrap")
 
 ## store data in hidden div
-@app.callback(Output('intermediate-value', 'children'),[Input('demo-dropdown1', 'value'),Input('demo-dropdown2', 'value')])
+@app.callback(
+    [Output('intermediate-value', 'children'),
+        Output('intermediate-value2','children')],
+    [Input('demo-dropdown1', 'value'),
+        Input('demo-dropdown2', 'value')])
 def store_df(value1,value2):
     if not value1 or not value2:
-        return None
+        return None,None
     elif value1 == value2:
-        return None
+        return None,None
     else:
         rubber_a,rubber_b = (value1,value2) if value1<value2 else (value2,value1)
         df = c.retrieve_comparative_comments(rubber_a,rubber_b)
         print(rubber_a,rubber_b)
         print(df.shape)
         if df.shape[0]==0:
-            return None
+            return None,None
         else:
-            return df.to_json()
+            return df.to_json(),0
 
 ## Update stacked bar chart based on intermediate output
 @app.callback(Output('comparison-graph', 'figure'), 
@@ -239,6 +246,14 @@ def update_graph2(json_cleaned_data,value1,value2):
         tally_df = cbc.transform_df_barchart(rubber_a,rubber_b,df)
         graph_output = cbc.create_chart(tally_df,rubber_a,rubber_b)
     return graph_output
+
+## Display Table Name
+@app.callback(Output("status", "children"),
+              [Input('demo-dropdown1', 'value'),
+               Input('demo-dropdown2', 'value')])
+def update_statusBar(value1,value2):
+    if value1 and value2:
+        return "RevSpin Data"
 
 ## update textbox from dropdown menu
 @app.callback(
@@ -301,39 +316,48 @@ def update_image_src_and_title(value):
         title = value.replace('-',' ')+ " Wordcloud"
         return path,title
 
-## Display Comments
-@app.callback([Output("comment-display-1","children"),
-                Output("comment-display-2","children"),
-                Output("comment-display-3","children"),
-                Output("comment-display-4","children")],
-            [Input('intermediate-value', 'children')])
-def update_comments(json_cleaned_data):
-    if json_cleaned_data:
-        df = pd.read_json(json_cleaned_data)
-        comments_array = list(set(df['COMMENT_TEXT']))
-        comment_1 = comments_array.pop() if comments_array else ''
-        comment_2 = comments_array.pop() if comments_array else ''
-        comment_3 = comments_array.pop() if comments_array else ''
-        comment_4 = comments_array.pop() if comments_array else ''
-        
-        return comment_1,comment_2,comment_3,comment_4
-    else:
-        return None,None,None,None
-
-## Display Table Name
-@app.callback(Output("status", "children"),
-              [Input('demo-dropdown1', 'value'),
-               Input('demo-dropdown2', 'value')])
-def update_statusBar(value1,value2):
-    if value1 and value2:
-        return "RevSpin Data"
-
 ## Update hover data
 @app.callback(Output("hover-check",'children'),
         [Input('comparison-graph','hoverData')])
 def display_hover_data(hoverData):
     print(hoverData)
     return json.dumps(hoverData,indent=2)
+
+## Display First 4 Comments upon hovering
+@app.callback([Output("comment-display-1","children"),
+                Output("comment-display-2","children"),
+                Output("comment-display-3","children"),
+                Output("comment-display-4","children"),
+                Output("btn-nclicks-2", "n_clicks"),
+                Output("btn-nclicks-1", "n_clicks")],
+     #           Output("intermediate-value2","children")],
+            [Input('intermediate-value', 'children'),
+                Input('hover-check','children')])
+    #            Input("btn-nclicks-2", "n_clicks")])
+def update_comments(json_cleaned_data,hoverData):
+    if hoverData not in('None','null') and json_cleaned_data:
+        #print("if clause 1")
+        
+        short_df = dc.subset_data(hoverData,json_cleaned_data)
+        comments = ['','','','']
+
+        if short_df.shape[0] >0:
+            ## Insert Comments
+            comments_array = list(short_df['COMMENT_TEXT'])
+            for i,cur_comment in enumerate(comments_array):
+                if i<4:
+                    comments[i] = cur_comment
+                    last_idx = i
+        
+        ## Return comment text and reset n-clicks index and cur-idx
+        return comments[0],comments[1],comments[2],comments[3],0,0
+
+    elif json_cleaned_data:
+        #print("if clause 2")
+        return None,None,None,None,0,0
+    else:
+        #print("if clause 3")
+        return None,None,None,None,0,0
 
 
 if __name__ == '__main__':
