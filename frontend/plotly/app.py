@@ -8,6 +8,7 @@ import pandas as pd
 import createBarChart as cbc
 import connectDb as c
 import nameConversion as nm
+import json
 
 ## Initialize app with CSS stylesheets
 external_stylesheets = [dbc.themes.BOOTSTRAP,'https://codepen.io/chriddyp/pen/bWLwgP.css']
@@ -142,7 +143,9 @@ app.layout = html.Div([
 
                             dcc.Interval(id="update4",interval=1000)
                             ]),
-            dcc.Graph(style={'height':300},id='comparison-graph'),]),
+            dcc.Graph(style={'height':300},id='comparison-graph'),
+            html.Div([html.P(children='init',id='hover-check')],style={'display': 'none'})
+            ]),
         width={"size": 5, "order": "first", "offset": 1}),
         dbc.Col(
             html.Div([
@@ -325,6 +328,12 @@ def update_statusBar(value1,value2):
     if value1 and value2:
         return "RevSpin Data"
 
+## Update hover data
+@app.callback(Output("hover-check",'children'),
+        [Input('comparison-graph','hoverData')])
+def display_hover_data(hoverData):
+    print(hoverData)
+    return json.dumps(hoverData,indent=2)
 
 
 if __name__ == '__main__':
