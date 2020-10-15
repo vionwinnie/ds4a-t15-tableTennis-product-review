@@ -320,7 +320,6 @@ def update_image_src_and_title(value):
 @app.callback(Output("hover-check",'children'),
         [Input('comparison-graph','hoverData')])
 def display_hover_data(hoverData):
-    print(hoverData)
     return json.dumps(hoverData,indent=2)
 
 ## Display First 4 Comments upon hovering
