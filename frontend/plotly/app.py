@@ -299,7 +299,7 @@ def update_image_src_and_title(value):
     if not value:
         return None,None
     else:
-        path = static_image_route + value + '.png'
+        path = static_image_route + value + '-black.png'
         title = value.replace('-',' ')+ " Wordcloud"
         return path,title
 
@@ -312,7 +312,7 @@ def update_image_src_and_title(value):
     if not value:
         return None,None
     else:
-        path = static_image_route + value + '.png'
+        path = static_image_route + value + '-red.png'
         title = value.replace('-',' ')+ " Wordcloud"
         return path,title
 

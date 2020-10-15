@@ -41,6 +41,8 @@ def rubbers_conversion():
 
 if __name__=="__main__":
     revspin_dict,dropdown_menu_list = rubbers_conversion()
-    print(revspin_dict.keys())
+    #print(revspin_dict.keys())
+    for cur in revspin_dict.keys():
+        print(cur)
 
 
