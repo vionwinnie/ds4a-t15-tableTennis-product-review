@@ -25,12 +25,12 @@
 - `pip install -r requirements.txt`
 
 ## Fire up Local Front End Environment
-- `cd frontend`
+- `cd frontend/plotly`
 - `python app.py`
 - Open up Google Chrome Browse to http://127.0.0.1:8888
 
 ## Fire up local sqlite db
-- `cd frontend/db`
+- `cd frontend/plotly/db`
 - `sqlite3`
 - `sqlite> .open tableTennisData.db`
 
