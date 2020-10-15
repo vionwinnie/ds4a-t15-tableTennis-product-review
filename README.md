@@ -8,7 +8,7 @@
 
 ## Live Deployment
 - On Heroku:  http://tabletennis-equipment-showdown.herokuapp.com/
-![dashboard]dashboardDisplay.png
+![dashboard screenshot] dashboardDisplay.png
 
 ## Directory Structure:
 - |-- EDA: Folders contain data analysis jupyter notebook
