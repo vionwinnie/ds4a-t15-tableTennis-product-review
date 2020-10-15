@@ -14,7 +14,7 @@ CREATE TABLE comments (
 );
 
 
-.import rubber_comparison_output_fixed2.csv comments
+.import rubber_comparison_output_new_sub_fixed.csv comments
 .headers off
 DELETE FROM comments WHERE aspect='aspect';
 SELECT COUNT(*) from comments;
