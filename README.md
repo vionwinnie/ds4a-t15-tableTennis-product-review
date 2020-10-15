@@ -1,8 +1,10 @@
 ## ds4a-t15-tableTennis-product-review
 - Contributor: Charlotte Giang, Eyan Yeung, Pooja Umathe, Jessie Zhang,Winnie Yeung (Team Lead)
 - Our team implements natural language processing models to mine comparative opinions on table tennis products
+- Deliverable: Interactive Dashboard for consumers to compare between two table tennis rubbers using comments collected from three table tennis forums
 - Tech Stack: MongoDB, Sqlite3, Python, Flask, Dash, Plotly, Fastapi, CSS, Bootstrap, Heroku
 - Live Deployment: http://tabletennis-equipment-showdown.herokuapp.com/
+![Dashboard](dashboardDisplay.png)
 
 ## Directory Structure:
 - |-- EDA: Folders contain data analysis jupyter notebook
