@@ -3,3 +3,6 @@ appengine-generated/
 
 __pycache__
 *~
+.ipynb_checkpoints
+EDA/.ipynb_checkpoints/
+*.DS_STORE
